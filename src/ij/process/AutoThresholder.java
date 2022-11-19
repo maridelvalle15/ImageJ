@@ -83,16 +83,12 @@ public class AutoThresholder {
 		// the Measures of Fuzziness" Pattern Recognition, 28(1): 41-51
 		// M. Emre Celebi  06.15.2007
 		// Ported to ImageJ plugin by G. Landini from E Celebi's fourier_0.8 routines
-		int threshold=-1;
-		int ih, it;
+		int ih;
 		int first_bin;
 		int last_bin;
 		double sum_pix;
 		double num_pix;
 		double term;
-		double ent;  // entropy 
-		double min_ent; // min entropy 
-		double mu_x;
 
 		/* Determine the first non-zero bin */
 		first_bin=0;
@@ -129,10 +125,18 @@ public class AutoThresholder {
 			/* NUM_PIX cannot be zero ! */
 			mu_1[ih - 1] = sum_pix / ( double ) num_pix;
 		}
+		
+		return get_threshold_that_minimizes_fuzzy_entropy(term,data,mu_0,mu_1);
+	}
 
-		/* Determine the threshold that minimizes the fuzzy entropy */
-		threshold = -1;
-		min_ent = Double.MAX_VALUE;
+	/* Determine the threshold that minimizes the fuzzy entropy */
+	private int get_threshold_that_minimizes_fuzzy_entropy(double term,int [] data,double [] mu_0,double [] mu_1) {
+		int it,ih;
+		int threshold = -1;
+		double ent;  // entropy 
+		double mu_x;
+		double min_ent = Double.MAX_VALUE;
+
 		for ( it = 0; it < 256; it++ ){
 			ent = 0.0;
 			for ( ih = 0; ih <= it; ih++ ) {
@@ -158,6 +162,7 @@ public class AutoThresholder {
 				threshold = it;
 			}
 		}
+
 		return threshold;
 	}
 
