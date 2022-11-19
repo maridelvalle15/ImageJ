@@ -1,6 +1,5 @@
 package ij.process;
 import ij.IJ;
-import java.util.Arrays;
 
 /** Autothresholding methods (limited to 256 bin histograms) from the Auto_Threshold plugin 
     (http://fiji.sc/Auto_Threshold) by G.Landini at bham dot ac dot uk). */
@@ -229,7 +228,6 @@ public class AutoThresholder {
 		for (int i=1; i<length - 1; i++) {
 			if (hist[i-1] < hist[i] && hist[i+1] < hist[i]){
 				tt += i;
-				//IJ.log("mode:" +i);
 			}
 		}
 		threshold = (int) Math.floor(tt/2.0);
@@ -302,7 +300,6 @@ public class AutoThresholder {
 		int[] data2 = new int[n];
 		int mode=0, maxCount=0;
 		for (int i=0; i<n; i++) {
-			int count = data[i];
 			data2[i] = data[i];
 			if (data2[i]>maxCount) {
 				maxCount = data2[i];
@@ -343,7 +340,6 @@ public class AutoThresholder {
 			return level;
 		}
 		int movingIndex = min;
-		int inc = Math.max(max/40, 1);
 		do {
 			sum1=sum2=sum3=sum4=0.0;
 			for (int i=min; i<=movingIndex; i++) {
@@ -423,14 +419,6 @@ public class AutoThresholder {
 			}
 			mean_obj = ( num_obj == 0 ? 0.0 : ( sum_obj / ( double ) num_obj ) );
 
-			/* Calculate the new threshold: Equation (7) in Ref. 2 */
-			//new_thresh = simple_round ( ( mean_back - mean_obj ) / ( Math.log ( mean_back ) - Math.log ( mean_obj ) ) );
-			//simple_round ( double x ) {
-			// return ( int ) ( IS_NEG ( x ) ? x - .5 : x + .5 );
-			//}
-			//
-			//#define IS_NEG( x ) ( ( x ) < -DBL_EPSILON ) 
-			//DBL_EPSILON = 2.220446049250313E-16
 			temp = ( mean_back - mean_obj ) / ( Math.log ( mean_back ) - Math.log ( mean_obj ) );
 
 			if (temp < -2.220446049250313E-16)
@@ -520,7 +508,6 @@ public class AutoThresholder {
 			/* Total entropy */
 			tot_ent = ent_back + ent_obj;
 
-			// IJ.log(""+max_ent+"  "+tot_ent);
 			if ( max_ent < tot_ent ) {
 				max_ent = tot_ent;
 				threshold = it;
@@ -555,7 +542,7 @@ public class AutoThresholder {
 		int threshold = Mean(data); //Initial estimate for the threshold is found with the MEAN algorithm.
 		int Tprev =-2;
 		double mu, nu, p, q, sigma2, tau2, w0, w1, w2, sqterm, temp;
-		//int counter=1;
+
 		while (threshold!=Tprev){
 			//Calculate some statistics.
 			mu = B(data, threshold)/A(data, threshold);
@@ -699,7 +686,6 @@ public class AutoThresholder {
 
 		// The threshold is the gray-level closest  
 		// to the p0-tile of the normalized histogram 
-		sum=0;
 		for (int i=0; i<256; i++){
 			sum+=histo[i];
 			if (sum>p0) {
@@ -730,7 +716,6 @@ public class AutoThresholder {
 
 		Sk = 0;
 		N1 = data[0]; // The entry for zero intensity
-		BCV = 0;
 		BCVmax=0;
 		kStar = 0;
 
@@ -771,7 +756,6 @@ public class AutoThresholder {
 		// See http://www.cs.tut.fi/~ant/histthresh/ for an excellent slide presentation
 		// and the original Matlab code.
 
-		int iter =0;
 		int threshold = -1;
 		double ptile= 0.5; // default fraction of foreground pixels
 		double [] avec = new double [256];
@@ -783,7 +767,6 @@ public class AutoThresholder {
 		double temp = 1.0;
 		for (int i=0; i<256; i++){
 			avec[i]=Math.abs((partialSum(data, i)/total)-ptile);
-			//IJ.log("Ptile["+i+"]:"+ avec[i]);
 			if (avec[i]<temp) {
 				temp = avec[i];
 				threshold = i;
@@ -889,8 +872,6 @@ public class AutoThresholder {
 			/* Total entropy */
 			tot_ent = ent_back + ent_obj;
 
-			// IJ.log(""+max_ent+"  "+tot_ent);
-
 			if ( max_ent < tot_ent ) {
 				max_ent = tot_ent;
 				threshold = it;
@@ -993,7 +974,6 @@ public class AutoThresholder {
 				beta3 = 1;
 			}
 		}
-		//IJ.log(""+t_star1+" "+t_star2+" "+t_star3);
 		/* Determine the optimal threshold value */
 		omega = P1[t_star3] - P1[t_star1];
 		opt_threshold = (int) (t_star1 * ( P1[t_star1] + 0.25 * omega * beta1 ) + 0.25 * t_star2 * omega * beta2  + t_star3 * ( P2[t_star3] + 0.25 * omega * beta3 ));
@@ -1122,11 +1102,9 @@ public class AutoThresholder {
 			}
 		}
 		// find which is the furthest side
-		//IJ.log(""+min+" "+max+" "+min2);
 		boolean inverted = false;
 		if ((max-min)<(min2-max)){
 			// reverse the histogram
-			//IJ.log("Reversing histogram.");
 			inverted = true;
 			int left  = 0;          // index of leftmost element
 			int right = 255; // index of rightmost element
@@ -1144,7 +1122,6 @@ public class AutoThresholder {
 		}
 
 		if (min == max){
-			//IJ.log("Triangle:  min == max.");
 			return min;
 		}
 
