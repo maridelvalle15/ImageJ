@@ -27,6 +27,8 @@ public class ColorBlitter implements Blitter {
 		int srcIndex, dstIndex;
 		int xSrcBase, ySrcBase;
 		int[] srcPixels;
+		int c1, c2, r1, g1, b1, r2, g2, b2;
+		int src, dst;
 		
 		int srcWidth = ip.getWidth();
 		int srcHeight = ip.getHeight();
@@ -50,8 +52,6 @@ public class ColorBlitter implements Blitter {
 		rect1 = rect1.intersection(rect2);
 		xSrcBase = (xloc<0)?-xloc:0;
 		ySrcBase = (yloc<0)?-yloc:0;
-		int c1, c2, r1, g1, b1, r2, g2, b2;
-		int src, dst;
 		
 		if (mode==COPY||mode==COPY_TRANSPARENT|| mode==COPY_ZERO_TRANSPARENT) {
 			for (int y=rect1.y; y<(rect1.y+rect1.height); y++) {

@@ -4,6 +4,8 @@ import ij.IJ;
 /** Autothresholding methods (limited to 256 bin histograms) from the Auto_Threshold plugin 
     (http://fiji.sc/Auto_Threshold) by G.Landini at bham dot ac dot uk). */
 public class AutoThresholder {
+	int it,ih;
+
 	private static String[] mStrings;
 			
 	public enum Method {
@@ -83,18 +85,20 @@ public class AutoThresholder {
 		// the Measures of Fuzziness" Pattern Recognition, 28(1): 41-51
 		// M. Emre Celebi  06.15.2007
 		// Ported to ImageJ plugin by G. Landini from E Celebi's fourier_0.8 routines
-		int ih;
 		int first_bin;
 		int last_bin;
 		double sum_pix;
 		double num_pix;
 		double term;
+
+		double [] mu_0 = new double[256];
+		double [] mu_1 = new double[256];
 		
 		first_bin = determineFirstNonZeroBin(data);
 		last_bin = determineLastNonZeroBin(data, first_bin);
 
 		term = 1.0 / ( double ) ( last_bin - first_bin );
-		double [] mu_0 = new double[256];
+		
 		sum_pix = num_pix = 0;
 		for ( ih = first_bin; ih < 256; ih++ ){
 			sum_pix += (double)ih * data[ih];
@@ -103,7 +107,6 @@ public class AutoThresholder {
 			mu_0[ih] = sum_pix / num_pix;
 		}
 
-		double [] mu_1 = new double[256];
 		sum_pix = num_pix = 0;
 		for ( ih = last_bin; ih > 0; ih-- ){
 			sum_pix += (double)ih * data[ih];
@@ -116,7 +119,6 @@ public class AutoThresholder {
 	}
 
 	private int determineFirstNonZeroBin(int [] data) {
-		int it,ih;
 		int first_bin=0;
 
 		for (ih = 0; ih < 256; ih++ ) {
@@ -130,7 +132,6 @@ public class AutoThresholder {
 	}
 
 	private int determineLastNonZeroBin(int[] data, int first_bin) {
-		int it,ih;
 		int last_bin=255;
 
 		for (ih = 255; ih >= first_bin; ih-- ) {
@@ -145,7 +146,6 @@ public class AutoThresholder {
 
 	/* Determine the threshold that minimizes the fuzzy entropy */
 	private int getThresholdThatMinimizesFuzzyEntropy(double term,int [] data,double [] mu_0,double [] mu_1) {
-		int it,ih;
 		int threshold = -1;
 		double ent;  // entropy 
 		double min_ent = Double.MAX_VALUE;
@@ -467,7 +467,6 @@ public class AutoThresholder {
 		// 06.15.2007
 		// Ported to ImageJ plugin by G.Landini from E Celebi's fourier_0.8 routines
 		int threshold=-1;
-		int ih, it;
 		int first_bin;
 		int last_bin;
 		double tot_ent;  /* total entropy */
@@ -495,7 +494,9 @@ public class AutoThresholder {
 		/* Determine the first non-zero bin */
 		first_bin=0;
 		for (ih = 0; ih < 256; ih++ ) {
-			if ( !(Math.abs(P1[ih])<2.220446049250313E-16)) {
+
+			boolean firstBinCondition = (Math.abs(P1[ih])>=2.220446049250313E-16);
+			if (firstBinCondition) {
 				first_bin = ih;
 				break;
 			}
@@ -504,7 +505,9 @@ public class AutoThresholder {
 		/* Determine the last non-zero bin */
 		last_bin=255;
 		for (ih = 255; ih >= first_bin; ih-- ) {
-			if ( !(Math.abs(P2[ih])<2.220446049250313E-16)) {
+
+			boolean lastBinCondition = (Math.abs(P2[ih])>=2.220446049250313E-16);
+			if (lastBinCondition) {
 				last_bin = ih;
 				break;
 			}
@@ -821,7 +824,6 @@ public class AutoThresholder {
 		int threshold; 
 		int opt_threshold;
 
-		int ih, it;
 		int first_bin;
 		int last_bin;
 		int tmp_var;
@@ -1013,7 +1015,6 @@ public class AutoThresholder {
 		//  Image Thresholding" Graphical Models and Image Processing, 56(5): 414-419
 		// Ported to ImageJ plugin by G.Landini from E Celebi's fourier_0.8 routines
 		int threshold;
-		int ih, it;
 		int first_bin;
 		int last_bin;
 		double term;
@@ -1205,7 +1206,6 @@ public class AutoThresholder {
 		// 06.15.2007
 		// Ported to ImageJ plugin by G.Landini from E Celebi's fourier_0.8 routines
 		int threshold;
-		int ih, it;
 		double crit;
 		double max_crit;
 		double [] norm_histo = new double[256]; /* normalized histogram */
