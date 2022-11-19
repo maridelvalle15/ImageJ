@@ -218,15 +218,10 @@ public class BinaryProcessor extends ByteProcessor {
 					p7 = pixels2[offset+rowOffset-1];
 					p8 = pixels2[offset+rowOffset];
 					p9 = pixels2[offset+rowOffset+1];
-					index = 0;
-					if (p1!=bgColor) index |= 1;
-					if (p2!=bgColor) index |= 2;
-					if (p3!=bgColor) index |= 4;
-					if (p6!=bgColor) index |= 8;
-					if (p9!=bgColor) index |= 16;
-					if (p8!=bgColor) index |= 32;
-					if (p7!=bgColor) index |= 64;
-					if (p4!=bgColor) index |= 128;
+					
+					int [] p = {0,p1,p2,p3,p4,0,p6,p7,p8,p9};
+					index = reassignIndex(p,bgColor);
+
 					code = table[index];
 					if ((pass&1)==1) { //odd pass
 						if (code==2||code==3) {
@@ -246,6 +241,20 @@ public class BinaryProcessor extends ByteProcessor {
 		return pixelsRemoved;
 	}
 	
+	private int reassignIndex(int [] p, int bgColor) {
+		int index = 0;
+		if (p[1]!=bgColor) index |= 1;
+		if (p[2]!=bgColor) index |= 2;
+		if (p[3]!=bgColor) index |= 4;
+		if (p[6]!=bgColor) index |= 8;
+		if (p[9]!=bgColor) index |= 16;
+		if (p[8]!=bgColor) index |= 32;
+		if (p[7]!=bgColor) index |= 64;
+		if (p[4]!=bgColor) index |= 128;
+
+		return index;
+	}
+
 	public void outline() {
 		process(OUTLINE);
 	}

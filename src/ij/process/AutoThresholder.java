@@ -83,34 +83,16 @@ public class AutoThresholder {
 		// the Measures of Fuzziness" Pattern Recognition, 28(1): 41-51
 		// M. Emre Celebi  06.15.2007
 		// Ported to ImageJ plugin by G. Landini from E Celebi's fourier_0.8 routines
-		int threshold=-1;
-		int ih, it;
+		int ih;
 		int first_bin;
 		int last_bin;
 		double sum_pix;
 		double num_pix;
 		double term;
-		double ent;  // entropy 
-		double min_ent; // min entropy 
-		double mu_x;
+		
+		first_bin = determineFirstNonZeroBin(data);
+		last_bin = determineLastNonZeroBin(data, first_bin);
 
-		/* Determine the first non-zero bin */
-		first_bin=0;
-		for (ih = 0; ih < 256; ih++ ) {
-			if ( data[ih] != 0 ) {
-				first_bin = ih;
-				break;
-			}
-		}
-
-		/* Determine the last non-zero bin */
-		last_bin=255;
-		for (ih = 255; ih >= first_bin; ih-- ) {
-			if ( data[ih] != 0 ) {
-				last_bin = ih;
-				break;
-			}
-		}
 		term = 1.0 / ( double ) ( last_bin - first_bin );
 		double [] mu_0 = new double[256];
 		sum_pix = num_pix = 0;
@@ -129,28 +111,53 @@ public class AutoThresholder {
 			/* NUM_PIX cannot be zero ! */
 			mu_1[ih - 1] = sum_pix / ( double ) num_pix;
 		}
+		
+		return getThresholdThatMinimizesFuzzyEntropy(term,data,mu_0,mu_1);
+	}
 
-		/* Determine the threshold that minimizes the fuzzy entropy */
-		threshold = -1;
-		min_ent = Double.MAX_VALUE;
+	private int determineFirstNonZeroBin(int [] data) {
+		int it,ih;
+		int first_bin=0;
+
+		for (ih = 0; ih < 256; ih++ ) {
+			if ( data[ih] != 0 ) {
+				first_bin = ih;
+				break;
+			}
+		}
+
+		return first_bin;
+	}
+
+	private int determineLastNonZeroBin(int[] data, int first_bin) {
+		int it,ih;
+		int last_bin=255;
+
+		for (ih = 255; ih >= first_bin; ih-- ) {
+			if ( data[ih] != 0 ) {
+				last_bin = ih;
+				break;
+			}
+		}
+
+		return last_bin;
+	}
+
+	/* Determine the threshold that minimizes the fuzzy entropy */
+	private int getThresholdThatMinimizesFuzzyEntropy(double term,int [] data,double [] mu_0,double [] mu_1) {
+		int it,ih;
+		int threshold = -1;
+		double ent;  // entropy 
+		double min_ent = Double.MAX_VALUE;
+
 		for ( it = 0; it < 256; it++ ){
 			ent = 0.0;
 			for ( ih = 0; ih <= it; ih++ ) {
-				/* Equation (4) in Ref. 1 */
-				mu_x = 1.0 / ( 1.0 + term * Math.abs ( ih - mu_0[it] ) );
-				if ( !((mu_x  < 1e-06 ) || ( mu_x > 0.999999))) {
-					/* Equation (6) & (8) in Ref. 1 */
-					ent += data[ih] * ( -mu_x * Math.log ( mu_x ) - ( 1.0 - mu_x ) * Math.log ( 1.0 - mu_x ) );
-				}
+				ent = equation4(ih,it,mu_0,term,data);
 			}
 
 			for ( ih = it + 1; ih < 256; ih++ ) {
-				/* Equation (4) in Ref. 1 */
-				mu_x = 1.0 / ( 1.0 + term * Math.abs ( ih - mu_1[it] ) );
-				if ( !((mu_x  < 1e-06 ) || ( mu_x > 0.999999))) {
-					/* Equation (6) & (8) in Ref. 1 */
-					ent += data[ih] * ( -mu_x * Math.log ( mu_x ) - ( 1.0 - mu_x ) * Math.log ( 1.0 - mu_x ) );
-				}
+				ent = equation4(ih,it,mu_1,term,data);
 			}
 			/* No need to divide by NUM_ROWS * NUM_COLS * LOG(2) ! */
 			if ( ent < min_ent ) {
@@ -158,7 +165,26 @@ public class AutoThresholder {
 				threshold = it;
 			}
 		}
+
 		return threshold;
+	}
+
+	/* Equation (4) in Ref. 1 */
+	private double equation4(int ih, int it,double [] mu,double term,int [] data) {
+		double mu_x;
+		double ent;  // entropy 
+
+		mu_x = 1.0 / ( 1.0 + term * Math.abs ( ih - mu[it] ) );
+		if ( !((mu_x  < 1e-06 ) || ( mu_x > 0.999999))) {
+			ent += equation6(data[ih],mu_x);
+		}
+
+		return ent;
+	}
+
+	/* Equation (6) & (8) in Ref. 1 */
+	private double equation6(int data, double mu_x) {
+		return data * ( -mu_x * Math.log ( mu_x ) - ( 1.0 - mu_x ) * Math.log ( 1.0 - mu_x ) );
 	}
 
 	boolean bimodalTest(double [] y) {
