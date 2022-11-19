@@ -494,7 +494,9 @@ public class AutoThresholder {
 		/* Determine the first non-zero bin */
 		first_bin=0;
 		for (ih = 0; ih < 256; ih++ ) {
-			if ( !(Math.abs(P1[ih])<2.220446049250313E-16)) {
+
+			boolean firstBinCondition = (Math.abs(P1[ih])>=2.220446049250313E-16);
+			if (firstBinCondition) {
 				first_bin = ih;
 				break;
 			}
@@ -503,7 +505,9 @@ public class AutoThresholder {
 		/* Determine the last non-zero bin */
 		last_bin=255;
 		for (ih = 255; ih >= first_bin; ih-- ) {
-			if ( !(Math.abs(P2[ih])<2.220446049250313E-16)) {
+
+			boolean lastBinCondition = (Math.abs(P2[ih])>=2.220446049250313E-16);
+			if (lastBinCondition) {
 				last_bin = ih;
 				break;
 			}
