@@ -20,12 +20,14 @@ public class BinaryProcessor extends ByteProcessor {
 	void process(int type) {
 		int p1, p2, p3, p4, p5, p6, p7, p8, p9;
 		int bgColor = 255;
+		int offset, v=0;
+        int rowOffset = width;
+
 		if (parent.isInvertedLut())
 			bgColor = 0;
 
 		byte[] pixels2 = (byte[])parent.getPixelsCopy();
-		int offset, v=0, sum;
-        int rowOffset = width;
+		
 		for (int y=yMin; y<=yMax; y++) {
 			offset = xMin + y * width;
 			p2 = pixels2[offset-rowOffset-1]&0xff;
