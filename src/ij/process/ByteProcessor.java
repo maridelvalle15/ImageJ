@@ -1215,7 +1215,6 @@ public class ByteProcessor extends ImageProcessor {
 
 	public float[][] toFloatArrays() {
 		float[][] a = new float[1][];
-		//ImageProcessor fp = crop();
 		ImageProcessor fp = convertToFloat();
 		a[0] = (float[])fp.getPixels();
 		return a;
@@ -1225,7 +1224,6 @@ public class ByteProcessor extends ImageProcessor {
 		ImageProcessor ip2 = new FloatProcessor(roiWidth, roiHeight, arrays[0], null);
 		ip2 = ip2.convertToByte(false);
 		setPixels(ip2.getPixels());
-		//insert(ip2, roiX, roiY); 
 	}
 
 	/** Returns a FloatProcessor with the same image, no scaling or calibration
