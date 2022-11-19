@@ -66,24 +66,10 @@ public class ByteBlitter implements Blitter {
 						pixels[dstIndex++] = (byte)(255-srcPixels[srcIndex++]&255);
 					break;
 				case COPY_TRANSPARENT:
-					for (int i=r1.width; --i>=0;) {
-						src = srcPixels[srcIndex++]&255;
-						if (src==transparent)
-							dst = pixels[dstIndex];
-						else
-							dst = src;
-						pixels[dstIndex++] = (byte)dst;
-					}
+					setPixels1(r1,srcPixels,srcIndex,transparent,pixels,dstIndex);
 					break;
 				case COPY_ZERO_TRANSPARENT:
-					for (int i=r1.width; --i>=0;) {
-						src = srcPixels[srcIndex++]&255;
-						if (src==0)
-							dst = pixels[dstIndex];
-						else
-							dst = src;
-						pixels[dstIndex++] = (byte)dst;
-					}
+				setPixels1(r1,srcPixels,srcIndex,0,pixels,dstIndex);
 					break;
 				case ADD:
 					for (int i=r1.width; --i>=0;) {
@@ -164,6 +150,20 @@ public class ByteBlitter implements Blitter {
 					}
 					break;
 			}
+		}
+	}
+
+	private void setPixels1(Rectangle r1, byte[] srcPixels, int srcIndex, int transparent, byte[] pixels,
+			int dstIndex) {
+		int src, dst;
+
+		for (int i=r1.width; --i>=0;) {
+			src = srcPixels[srcIndex++]&255;
+			if (src==transparent)
+				dst = pixels[dstIndex];
+			else
+				dst = src;
+			pixels[dstIndex++] = (byte)dst;
 		}
 	}
 }
