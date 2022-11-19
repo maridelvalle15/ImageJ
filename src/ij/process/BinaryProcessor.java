@@ -1,5 +1,4 @@
 package ij.process;
-import java.awt.*;
 
 /** This class processes binary images. */
 public class BinaryProcessor extends ByteProcessor {
@@ -18,7 +17,7 @@ public class BinaryProcessor extends ByteProcessor {
 
 	static final int OUTLINE=0;
 	
-	void process(int type, int count) {
+	void process(int type) {
 		int p1, p2, p3, p4, p5, p6, p7, p8, p9;
 		int bgColor = 255;
 		if (parent.isInvertedLut())
@@ -183,7 +182,6 @@ public class BinaryProcessor extends ByteProcessor {
                 bp.fill();
             }
             bp.insert(this, 1, 1);
-            //new ImagePlus("ip2", ip2).show();
             return bp;
         } else
             return this;
@@ -206,7 +204,6 @@ public class BinaryProcessor extends ByteProcessor {
 		int v, index, code;
         int offset, rowOffset = width;
         int pixelsRemoved = 0;
-        int count = 100;
 		for (int y=yMin; y<=yMax; y++) {
 			offset = xMin + y * width;
 			for (int x=xMin; x<=xMax; x++) {
@@ -250,7 +247,7 @@ public class BinaryProcessor extends ByteProcessor {
 	}
 	
 	public void outline() {
-		process(OUTLINE, 0);
+		process(OUTLINE);
 	}
 	
 }
